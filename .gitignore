@@ -11,3 +11,6 @@ venv/
 *.tmp 
 .DS_Store 
  
+# Ignore .png files 
+*.png 
+  

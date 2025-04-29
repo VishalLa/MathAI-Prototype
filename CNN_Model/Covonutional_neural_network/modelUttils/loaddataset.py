@@ -83,7 +83,7 @@ def load_dataset_from_folder(folder_path, target_size=(28, 28)):
 
 
 def load_dataset(folder_path: list[str]):
-    path_for_mnist = 'C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\Model\\entiredataset\\mnist.npz'
+    path_for_mnist = '"C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\mnist.npz"'
     mnist_images, mnist_labels = load_mnist_dataset(path_for_mnist)
 
     # Normalize MNIST images to [0, 1]

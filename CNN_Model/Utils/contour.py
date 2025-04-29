@@ -131,7 +131,7 @@ def predict_chracters(char_images, model):
 
     predictions = []
 
-    for img in char_images:
+    for _, img in char_images:
         img_tensor = torch.tensor(img, dtype=torch.float32).unsqueeze(0).unsqueeze(0)  # [1, 1, 28, 28]
         img_tensor = img_tensor.to(device)
 

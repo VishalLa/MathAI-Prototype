@@ -11,3 +11,12 @@ venv/
 *.tmp 
 .DS_Store 
  
+# Ignore images 
+*.jpg
+*.png 
+
+
+#  in the working copy of 'CNN_Model/pca.ipynb', LF will be replaced by CRLF the next time Git touches it
+*.py text eol=lf
+*.ipynb text eol=lf
+

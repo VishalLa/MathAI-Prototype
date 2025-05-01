@@ -17,7 +17,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtCore import Qt
 
-from board import Ui_MainWindow
+from Whiteboard.board import Ui_MainWindow
 from boardscene import BoardScene
 from CNN_Model.Utils.pre_process import predict_chars 
 

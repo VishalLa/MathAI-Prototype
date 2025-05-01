@@ -6,7 +6,7 @@ from torch.utils.data import DataLoader, TensorDataset
 
 
 
-def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\Model\\model_parameters.pth'):
+def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
     '''
     Saves the model parameters (weights and biases) to a file.
 
@@ -19,7 +19,7 @@ def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\M
 
 
 
-def load_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\Model\\model_parameters.pth'):
+def load_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
     '''
     Loads the model parameters (weights and biases) from a file.
 
@@ -54,7 +54,7 @@ def split_dataset(X, Y, size=0.9):
 
 
 
-def train(network, data_loder, loss_function, optimizer, device, epochs=25, batch_size=64):
+def train(network, data_loder, loss_function, optimizer, device, epochs=20, batch_size=64):
 
     for epoch in range(epochs):
         running_loss = 0.0

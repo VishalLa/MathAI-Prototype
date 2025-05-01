@@ -9,6 +9,9 @@ from torch.utils.data import DataLoader, TensorDataset
 from modelUttils.loaddataset import load_dataset
 from modelUttils.model_utils import save_model, test, train, split_dataset
 
+from modelUttils.augment_dataset import augment_image
+
+from sklearn.utils import shuffle
 from sklearn.model_selection import KFold
 
 from network import CNN
@@ -33,9 +36,11 @@ class ModelPipeline:
         self.data_folder = data_folder
 
         # Load and prepare dataset
-        self.X, self.Y = load_dataset(self.data_folder)
+        self.X, self.Y = load_dataset(self.data_folder, apply_noise_fun=augment_image)
         print(f"Unique labels in dataset: {torch.unique(self.Y)}")
         self.X_train, self.X_test, self.Y_train, self.Y_test = split_dataset(self.X, self.Y)
+
+        self.X_train, self.Y_train = shuffle(self.X_train, self.Y_train, random_state=42)
 
         self.X_train = self.X_train.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
         self.X_test = self.X_test.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
@@ -56,7 +61,7 @@ class ModelPipeline:
         fold_accuracies = []
         final_model = None
 
-        for fold, (train_idx, val_idx) in enumerate(kfold.split(self.X)):
+        for fold, (train_idx, val_idx) in enumerate(kfold.split(self.X_train)):
             print(f"Fold {fold + 1}/{k}")
 
             train_images, val_images = self.X[train_idx], self.X[val_idx]

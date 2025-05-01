@@ -44,7 +44,7 @@ def load_mnist_dataset(path):
 
     return image, label
 
-def load_dataset_from_folder(folder_path, target_size=(28, 28)):
+def load_dataset_from_folder(folder_path, target_size=(28, 28), apply_noise_fun=None):
 
     custom_images = []
     custom_labels = []
@@ -63,6 +63,9 @@ def load_dataset_from_folder(folder_path, target_size=(28, 28)):
                 img_array = np.array(img)
                 _, binary_image =  cv2.threshold(img_array, 100, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
+                if apply_noise_fun:
+                    binary_image = apply_noise_fun(binary_image)
+                    
                 if '-' in filename:
                     label_str = filename.split('-')[0]
                 else:
@@ -76,13 +79,15 @@ def load_dataset_from_folder(folder_path, target_size=(28, 28)):
                 custom_images.append(binary_image)
                 custom_labels.append(label_to_index[label_str])
 
+
             except Exception as e:
-                print(f'Error loading image {file_path}: {e}')
+                print(f'Error loading image {file_path}: {type(e).__name__} - {e}')
                 continue
     return custom_images, custom_labels
 
 
-def load_dataset(folder_path: list[str]):
+def load_dataset(folder_path: list[str], apply_noise_fun=None):
+    print('Loading Dataset .............')
     path_for_mnist = 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\mnist.npz'
     mnist_images, mnist_labels = load_mnist_dataset(path_for_mnist)
 
@@ -99,7 +104,7 @@ def load_dataset(folder_path: list[str]):
     labels.append(mnist_labels)
 
     for path in folder_path:
-        custom_images, custom_labels = load_dataset_from_folder(path)
+        custom_images, custom_labels = load_dataset_from_folder(path, apply_noise_fun=apply_noise_fun)
 
         # Skip if no valid images were found
         if len(custom_images) == 0:
@@ -123,5 +128,7 @@ def load_dataset(folder_path: list[str]):
     # Convert from NumPy to Tensor
     combined_images = torch.tensor(combined_images, dtype=torch.float32)
     combined_labels = torch.tensor(combined_labels, dtype=torch.long)    
+
+    print(f'Total images lodded: {combined_images.shape[0]}')
 
     return combined_images, combined_labels

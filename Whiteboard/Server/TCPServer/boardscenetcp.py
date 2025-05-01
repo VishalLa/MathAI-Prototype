@@ -1,3 +1,11 @@
+import sys
+import os
+
+# Add project root to sys.path
+root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.append(root_dir)
+
+
 from PySide6.QtWidgets import (
     QMainWindow,
     QGraphicsScene,
@@ -25,7 +33,7 @@ from PySide6.QtCore import (
 
 import numpy as np
 
-from ..tcpServerNet import start_server, MyServer, signal_manager
+from Server.tcpServerNet import start_server, MyServer, signal_manager
 
 itemType = set()
 myserver = MyServer()
@@ -116,7 +124,7 @@ class BoardScene(QGraphicsScene):
                 for item in self.items():
                     itemType.add(type(item).__name__)
                 
-                self.drawing_event('mousePressEvent')
+                self.drawing_events('mousePressEvent')
 
                 signal_manager.function_call.emit(True)
 
@@ -159,14 +167,26 @@ class BoardScene(QGraphicsScene):
         self.data["state"] = self.drawing
         self.data["event"] = event_name
         self.data["position"] = self.previous_position
-        self.data["color"] = self.my_pen.color()
-        self.data["widthF"] = self.my_pen.widthF()
-        self.data["width"] = self.my_pen.width()
-        self.data["capStyle"] = self.my_pen.capStyle()
-        self.data["joinStyle"] = self.my_pen.joinStyle()
-        self.data["style"] = self.my_pen.style()
-        self.data["pattern"] = self.my_pen.dashPattern()
-        self.data["patternOffset"] = self.my_pen.dashOffset()
+
+        if self.my_pen:
+            self.data["color"] = self.my_pen.color()
+            self.data["widthF"] = self.my_pen.widthF()
+            self.data["width"] = self.my_pen.width()
+            self.data["capStyle"] = self.my_pen.capStyle()
+            self.data["joinStyle"] = self.my_pen.joinStyle()
+            self.data["style"] = self.my_pen.style()
+            self.data["pattern"] = self.my_pen.dashPattern()
+            self.data["patternOffset"] = self.my_pen.dashOffset()
+        else:
+            # Default or safe fallback values
+            self.data["color"] = QColor(Qt.black)
+            self.data["widthF"] = 1.0
+            self.data["width"] = 1
+            self.data["capStyle"] = Qt.RoundCap
+            self.data["joinStyle"] = Qt.RoundJoin
+            self.data["style"] = Qt.SolidLine
+            self.data["pattern"] = []
+            self.data["patternOffset"] = 0
     
     
     def start_drawing(self, pos):

@@ -4,8 +4,8 @@ from PySide6.QtGui import QPainterPath
 from PySide6.QtNetwork import QTcpServer, QTcpSocket, QHostAddress, QAbstractSocket
 import json
 
-from netManage import SignalManager
-from getip import get_local_ip, get_ipv6_address
+from Server.netManage import SignalManager
+from .getip import get_local_ip, get_ipv6_address
 
 signal_manager = SignalManager()
 

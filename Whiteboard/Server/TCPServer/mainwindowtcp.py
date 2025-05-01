@@ -39,6 +39,7 @@ from Server.tcpServerNet import start_server, MyServer, signal_manager
 
 myserver = MyServer()
 
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
@@ -84,6 +85,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.actionCoolDude.triggered.connect(self.New_file)
         self.actionSave_As.triggered.connect(self.save_file)
+        self.actionNew_3.triggered.connect(self.load_file)
 
 
     def save_file(self):

@@ -35,7 +35,7 @@ from Whiteboard.board import Ui_MainWindow
 from boardscenetcp import BoardScene
 
 from CNN_Model.Utils.pre_process import predict_chars 
-from ..tcpServerNet import start_server, MyServer, signal_manager
+from Server.tcpServerNet import start_server, MyServer, signal_manager
 
 myserver = MyServer()
 

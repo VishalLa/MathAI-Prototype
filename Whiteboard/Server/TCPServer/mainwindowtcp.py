@@ -45,6 +45,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setupUi(self)
 
+        self.child_windows = []
+
         self.tool_button_group = QButtonGroup()
         self.tool_button_group.setExclusive(True)
         self.tool_button_group.addButton(self.pb_Pen)
@@ -84,149 +86,110 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
         self.actionCoolDude.triggered.connect(self.New_file)
-        self.actionSave_As.triggered.connect(self.save_file)
-        self.actionNew_3.triggered.connect(self.load_file)
+        self.actionOpen.triggered.connect(self.load_file)
+        self.actionSave.triggered.connect(self.save_file)
+        self.actionSave_As.triggered.connect(self.saveas_file)
+
+
+    def saveas_file(self):
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save As', '', 'Whiteboard File (*.json)')
+        if filename:
+            if not filename.endswith('.json'):
+                filename += '.json'
+            data = {
+                'lines': [],
+                'scene_rect': [self.scene.sceneRect().width(), self.scene.sceneRect().height()],
+                'color': self.scene.color.name(),
+                'size': self.scene.size
+            }
+            for item in reversed(self.scene.items()):
+                if isinstance(item, QGraphicsPathItem):
+                    line_data = {
+                        'color': item.pen().color().name(),
+                        'width': item.pen().widthF(),
+                        'points': []
+                    }
+                    for subpath in item.path().toSubpathPolygons():
+                        line_data['points'].extend([(point.x(), point.y()) for point in subpath])
+                    data['lines'].append(line_data)
+            with open(filename, 'w') as file:
+                json.dump(data, file)
 
 
     def save_file(self):
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Whiteboard File (*.json)') # open dialog
-        # window to save file
-
+        filename, _ = QFileDialog.getSaveFileName(self, 'Save File', '', 'Whiteboard File (*.json)')
         if filename:
+            if not filename.endswith('.json'):
+                filename += '.json'
             data = {
-                'lines': [], # Store info of each line
-                'scene_rect': [self.scene.width(), self.scene.height()], # Store dimension of scene
-                'color': self.scene.color.name(), # Store the used coloe
-                'size': self.scene.size # store the size of the pen
+                'lines': [],
+                'scene_rect': [self.scene.sceneRect().width(), self.scene.sceneRect().height()],
+                'color': self.scene.color.name(),
+                'size': self.scene.size
             }
-
-            # loop for checking of drawin path
             for item in reversed(self.scene.items()):
                 if isinstance(item, QGraphicsPathItem):
-                    line_data = line_data = {
+                    line_data = {
                         'color': item.pen().color().name(),
                         'width': item.pen().widthF(),
-                        'points': [],  # stores the (X,Y) coordinate of the line
-                        # 'z_value': item.zValue()  # Store the z-value
+                        'points': []
                     }
-
-                    # Extract points form the path
                     for subpath in item.path().toSubpathPolygons():
-                        # to SubpathPolygons method is used to break down
-                        # the complex line into sub parts and store it
                         line_data['points'].extend([(point.x(), point.y()) for point in subpath])
-
                     data['lines'].append(line_data)
-
             with open(filename, 'w') as file:
                 json.dump(data, file)
 
 
     def load_file(self):
-        self.scene.z_index_counter = 0
-        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Whiteboard Files (*.json)")  # open dialog
-        # window to Open the file
-        if filename:  # reading the file
-            with open(filename, 'r') as file:
-                data = json.load(file)
+        filename, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Whiteboard Files (*.json)")
+        if filename:
+            try:
+                with open(filename, 'r') as file:
+                    data = json.load(file)
 
-            self.scene.clear()
+                self.scene.clear()
+                self.scene.setSceneRect(0, 0, data['scene_rect'][0], data['scene_rect'][1])
+                self.scene.change_color(QColor(data['color']))
+                self.scene.change_size(data['size'])
 
-            # Set scene properties
-            self.scene.setSceneRect(0, 0, data['scene_rect'][0], data['scene_rect'][1])
-            self.scene.change_color(QColor(data['color']))
-            self.scene.change_size(data['size'])
-
-            z_index_counter = 0
-
-            items = []  # List to hold items before sorting
-            # Add lines to the scene
-            for line_data in data['lines']:
-                path = QPainterPath()
-                path.moveTo(line_data['points'][0][0], line_data['points'][0][1])
-
-                for subpath in line_data['points'][1:]:
-                    path.lineTo(subpath[0], subpath[1])
-
-                pathItem = QGraphicsPathItem(path)
-                pathItem.setZValue(z_index_counter)  # Assign unique z-index
-                z_index_counter += 1  # Increment counter
-                my_pen = QPen(QColor(line_data['color']), line_data['width'])
-                my_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-                pathItem.setPen(my_pen)
-
-                # items.append(pathItem)
-
-                self.scene.addItem(pathItem)
-            #
-            # items.sort(key=lambda x: x.zValue())
-            # for item in items:
-                # self.scene.addItem(pathItem)
+                for line_data in data['lines']:
+                    path = QPainterPath()
+                    path.moveTo(line_data['points'][0][0], line_data['points'][0][1])
+                    for subpath in line_data['points'][1:]:
+                        path.lineTo(subpath[0], subpath[1])
+                    pathItem = QGraphicsPathItem(path)
+                    my_pen = QPen(QColor(line_data['color']), line_data['width'])
+                    my_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+                    pathItem.setPen(my_pen)
+                    self.scene.addItem(pathItem)
+            except Exception as e:
+                print(f"Error loading file: {e}")
 
 
     def build_scene_file(self, data):
         self.scene.clear()
         scene_file = data['scene_info']
+        self.scene.setSceneRect(0, 0, *scene_file.get('scene_rect', [600, 500]))
+        self.scene.change_color(QColor(scene_file.get('color', '#000000')))
+        self.scene.change_size(scene_file.get('size', 5))
 
-        undo_flag = data['flag']
-
-        self.scene.drawing = True
-        prev = {'lines': [],  # stores info of each line drawn
-                'scene_rect': [],  # stores dimension of scene
-                'color': "",  # store the color used
-                'size': 20  # store the size of the pen
-                }
-
-        top_z = self.scene.get_topmost_z_index()
-        try:
-            if 'scene_info' in data:
-                if 'scene_rect' in scene_file:
-                    scene_rect = scene_file['scene_rect']
-                    self.scene.setSceneRect(0, 0, scene_rect[0], scene_rect[1])
-                else:
-                    # Provide default scene rectangle if 'scene_rect' key is missing
-                    self.scene.setSceneRect(0, 0, 600, 500)  # Adjust the default values as needed
-                self.scene.change_color(QColor(scene_file['color']))
-                self.scene.color.setAlpha(255)
-
-                if 'size' in scene_file.keys():
-                    self.scene.change_size(scene_file['size'])
-                    prev = scene_file
-                else:
-                    pass
-                # Add lines to the scene
-                if 'lines' in scene_file:
-                    for line_data in scene_file['lines']:
-                        path = QPainterPath()
-                        path.moveTo(line_data['points'][0][0], line_data['points'][0][1])
-                        print("line_data is cool")
-
-                        for subpath in line_data['points'][1:]:
-                            path.lineTo(subpath[0], subpath[1])
-                        print("Whatever tf subpath is, it's cool")
-
-                        self.scene.temppath.clear()
-
-                        if path not in self.scene.temppath:
-                            self.scene.temppath.append(path)
-                        print(3)
-                        pathItem = QGraphicsPathItem(path)
-                        self.scene.next_z_index += 10  # Adjust increment as needed
-                        pathItem.setZValue(self.scene.next_z_index)
-                        my_pen = QPen(QColor(line_data['color']), line_data['width'])
-                        my_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-                        pathItem.setPen(my_pen)
-                        pathItem.setZValue(self.scene.itemsBoundingRect().height() + 1)
-                        self.scene.addItem(pathItem)
-
-        except IndexError as e:
-            print(e)
-            pass
+        for line_data in scene_file.get('lines', []):
+            path = QPainterPath()
+            path.moveTo(line_data['points'][0][0], line_data['points'][0][1])
+            for subpath in line_data['points'][1:]:
+                path.lineTo(subpath[0], subpath[1])
+            pathItem = QGraphicsPathItem(path)
+            my_pen = QPen(QColor(line_data['color']), line_data['width'])
+            my_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+            pathItem.setPen(my_pen)
+            self.scene.addItem(pathItem)
 
     
     def New_file(self):
         new_file = MainWindow()
         new_file.show()
+        self.child_windows.append(new_file)
 
 
     def predict(self):

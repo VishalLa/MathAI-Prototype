@@ -54,7 +54,7 @@ def split_dataset(X, Y, size=0.9):
 
 
 
-def train(network, data_loder, loss_function, optimizer, device, epochs=20, batch_size=64):
+def train(network, data_loder, loss_function, optimizer, device, epochs=25, batch_size=64):
 
     for epoch in range(epochs):
         running_loss = 0.0

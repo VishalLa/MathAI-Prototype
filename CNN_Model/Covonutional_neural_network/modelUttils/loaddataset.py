@@ -3,6 +3,7 @@ import cv2
 import torch 
 import numpy as np
 from PIL import Image
+from .augment_dataset import add_label_noise
 
 
 label_to_index = {
@@ -44,7 +45,7 @@ def load_mnist_dataset(path):
 
     return image, label
 
-def load_dataset_from_folder(folder_path, target_size=(28, 28), apply_noise_fun=None):
+def load_dataset_from_folder(folder_path, target_size=(28, 28)):
 
     custom_images = []
     custom_labels = []
@@ -62,12 +63,16 @@ def load_dataset_from_folder(folder_path, target_size=(28, 28), apply_noise_fun=
                 img = img.resize(target_size)
                 img_array = np.array(img)
                 _, binary_image =  cv2.threshold(img_array, 100, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                if apply_noise_fun:
-                    binary_image = apply_noise_fun(binary_image)
+                binary_image = binary_image / 255.0
                     
                 if '-' in filename:
                     label_str = filename.split('-')[0]
+                    if label_str not in label_to_index:
+                        print(f'Skipping image {file_path}: Label {label_str} not in label_to_index')
+                        continue
+
+                    numeric_label = label_to_index[label_str]
+                    binary_image = add_label_noise(binary_image, numeric_label)
                 else:
                     print(f'Skipping image {file_path}: Unaple to extract label')
                     continue
@@ -86,7 +91,7 @@ def load_dataset_from_folder(folder_path, target_size=(28, 28), apply_noise_fun=
     return custom_images, custom_labels
 
 
-def load_dataset(folder_path: list[str], apply_noise_fun=None):
+def load_dataset(folder_path: list[str]):
     print('Loading Dataset .............')
     path_for_mnist = 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\mnist.npz'
     mnist_images, mnist_labels = load_mnist_dataset(path_for_mnist)
@@ -104,18 +109,16 @@ def load_dataset(folder_path: list[str], apply_noise_fun=None):
     labels.append(mnist_labels)
 
     for path in folder_path:
-        custom_images, custom_labels = load_dataset_from_folder(path, apply_noise_fun=apply_noise_fun)
+        custom_images, custom_labels = load_dataset_from_folder(path)
 
         # Skip if no valid images were found
         if len(custom_images) == 0:
             print(f"No valid images found in folder: {path}")
             continue
 
-        # Normalize custom images to [0, 1]
-        custom_images = np.array(custom_images) / 255.0
-
         # Add a channel dimension to custom images (for grayscale images)
-        custom_images = custom_images[:, np.newaxis, :, :]
+        custom_images = np.expand_dims(np.array(custom_images), axis=1)
+
 
         # Append the images and labels
         images.append(custom_images)

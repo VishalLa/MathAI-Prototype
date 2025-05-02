@@ -9,8 +9,6 @@ from torch.utils.data import DataLoader, TensorDataset
 from modelUttils.loaddataset import load_dataset
 from modelUttils.model_utils import save_model, test, train, split_dataset
 
-from modelUttils.augment_dataset import augment_image
-
 from sklearn.utils import shuffle
 from sklearn.model_selection import KFold
 
@@ -36,7 +34,7 @@ class ModelPipeline:
         self.data_folder = data_folder
 
         # Load and prepare dataset
-        self.X, self.Y = load_dataset(self.data_folder, apply_noise_fun=augment_image)
+        self.X, self.Y = load_dataset(self.data_folder)
         print(f"Unique labels in dataset: {torch.unique(self.Y)}")
         self.X_train, self.X_test, self.Y_train, self.Y_test = split_dataset(self.X, self.Y)
 
@@ -56,7 +54,7 @@ class ModelPipeline:
             device=self.device
         )
 
-    def cross_validate_model(self, k=5, batch_size=64, learning_rate=0.001):
+    def cross_validate_model(self, k=10, batch_size=64, learning_rate=0.0001):
         kfold = KFold(n_splits=k, shuffle=True, random_state=42)
         fold_accuracies = []
         final_model = None

@@ -88,32 +88,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionCoolDude.triggered.connect(self.New_file)
         self.actionOpen.triggered.connect(self.load_file)
         self.actionSave.triggered.connect(self.save_file)
-        self.actionSave_As.triggered.connect(self.saveas_file)
-
-
-    def saveas_file(self):
-        filename, _ = QFileDialog.getSaveFileName(self, 'Save As', '', 'Whiteboard File (*.json)')
-        if filename:
-            if not filename.endswith('.json'):
-                filename += '.json'
-            data = {
-                'lines': [],
-                'scene_rect': [self.scene.sceneRect().width(), self.scene.sceneRect().height()],
-                'color': self.scene.color.name(),
-                'size': self.scene.size
-            }
-            for item in reversed(self.scene.items()):
-                if isinstance(item, QGraphicsPathItem):
-                    line_data = {
-                        'color': item.pen().color().name(),
-                        'width': item.pen().widthF(),
-                        'points': []
-                    }
-                    for subpath in item.path().toSubpathPolygons():
-                        line_data['points'].extend([(point.x(), point.y()) for point in subpath])
-                    data['lines'].append(line_data)
-            with open(filename, 'w') as file:
-                json.dump(data, file)
+        self.actionSave_As.triggered.connect(self.save_file)
 
 
     def save_file(self):

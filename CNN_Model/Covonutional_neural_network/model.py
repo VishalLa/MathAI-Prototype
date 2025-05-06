@@ -23,8 +23,10 @@ sys.path.append(current_directory)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+
 # Load the model architecture
 network = CNN().to(device)
+
 
 class ModelPipeline:
     def __init__(self, data_folder: list[str]):
@@ -34,7 +36,10 @@ class ModelPipeline:
         self.data_folder = data_folder
 
         # Load and prepare dataset
-        self.X, self.Y = load_dataset(self.data_folder)
+        self.X, self.Y = load_dataset(
+            data_foldel = self.data_folder
+        )
+
         print(f"Unique labels in dataset: {torch.unique(self.Y)}")
         self.X_train, self.X_test, self.Y_train, self.Y_test = split_dataset(self.X, self.Y)
 
@@ -54,7 +59,7 @@ class ModelPipeline:
             device=self.device
         )
 
-    def cross_validate_model(self, k=10, batch_size=64, learning_rate=0.0001):
+    def cross_validate_model(self, k=5, batch_size=64, learning_rate=0.0001):
         kfold = KFold(n_splits=k, shuffle=True, random_state=42)
         fold_accuracies = []
         final_model = None
@@ -62,8 +67,8 @@ class ModelPipeline:
         for fold, (train_idx, val_idx) in enumerate(kfold.split(self.X_train)):
             print(f"Fold {fold + 1}/{k}")
 
-            train_images, val_images = self.X[train_idx], self.X[val_idx]
-            train_labels, val_labels = self.Y[train_idx], self.Y[val_idx]
+            train_images, val_images = self.X_train[train_idx], self.X_train[val_idx]
+            train_labels, val_labels = self.Y_train[train_idx], self.Y_train[val_idx]
 
             train_dataset = TensorDataset(train_images, train_labels)
             val_dataset = TensorDataset(val_images, val_labels)
@@ -117,19 +122,26 @@ class ModelPipeline:
         save_model(self.model)
 
 
-folder_paths = [
-    "C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\digitdataset1",
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\-',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\(',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\)',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\+',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\x',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\symbols\\÷',
+data_folder = [
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\0', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\1', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\2', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\3', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\4', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\5', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\6', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\7', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\8', 
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\9',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\add','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\+','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\dec','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\div',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\eq',    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\mul', 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\x','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\sub','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\-',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\x',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\y',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\z'
 ]
 
 
-
-pipeline = ModelPipeline(folder_paths)
+pipeline = ModelPipeline(data_folder=data_folder)
 
 pipeline.cross_validate_model()
 pipeline.test_model()

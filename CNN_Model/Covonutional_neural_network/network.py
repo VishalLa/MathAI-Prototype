@@ -16,30 +16,17 @@ class CNN(nn.Module):
             # 1st conv layer
             nn.Conv2d(
                 in_channels=1,
-                out_channels=8,
-                kernel_size=(3,3),
-                padding=1,
-                stride=1,
-                bias=True
-            ),
-            nn.BatchNorm2d(8),
-            nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
-
-            # 2nd conv layer 
-            nn.Conv2d(
-                in_channels=8,
                 out_channels=16,
                 kernel_size=(3,3),
-                padding=1,
+                padding=2,
                 stride=1,
                 bias=True
             ),
             nn.BatchNorm2d(16),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2,2),stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
 
-            # 3rd conv layer 
+            # 2nd conv layer 
             nn.Conv2d(
                 in_channels=16,
                 out_channels=32,
@@ -50,9 +37,9 @@ class CNN(nn.Module):
             ),
             nn.BatchNorm2d(32),
             nn.ReLU(),
-            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
+            nn.MaxPool2d(kernel_size=(2,2),stride=2, padding=1),
 
-            # 4th conv layer
+            # 3rd conv layer 
             nn.Conv2d(
                 in_channels=32,
                 out_channels=64,
@@ -65,7 +52,7 @@ class CNN(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
 
-            # 5th conv layer
+            # 4th conv layer
             nn.Conv2d(
                 in_channels=64,
                 out_channels=128,
@@ -76,6 +63,19 @@ class CNN(nn.Module):
             ),
             nn.BatchNorm2d(128),
             nn.ReLU(),
+            nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1),
+
+            # 5th conv layer
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=256,
+                kernel_size=(3,3),
+                padding=1,
+                stride=1,
+                bias=True
+            ),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
             nn.MaxPool2d(kernel_size=(2,2), stride=2, padding=1)
         )
 
@@ -84,9 +84,13 @@ class CNN(nn.Module):
         #     dummy_input = torch.zeros(1, 1, 28, 28)  # Batch size 1, 1 channel, 28x28 image
         #     output_size = self.conv_layers(dummy_input).view(1, -1).shape[1]
 
-        nn.Flatten(),
+        self.flatten = nn.Flatten(),
 
         self.fc_layers = nn.Sequential(
+            nn.Linear(in_features=1024, out_features=512, bias=True),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+
             nn.Linear(in_features=512, out_features=258, bias=True),
             nn.ReLU(),
             nn.Dropout(0.3),

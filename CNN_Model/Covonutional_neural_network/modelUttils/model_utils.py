@@ -1,7 +1,5 @@
 import torch
 import numpy as np
-from PIL import Image
-import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, TensorDataset
 
 
@@ -54,15 +52,15 @@ def split_dataset(X, Y, size=0.9):
 
 
 
-def train(network, data_loder, loss_function, optimizer, device, epochs=20, batch_size=64):
+def train(network, data_loader, loss_function, optimizer, device, epochs=100, batch_size=64):
 
     for epoch in range(epochs):
         running_loss = 0.0
-        for x_batch, labels_batch in data_loder:
+        for x_batch, labels_batch in data_loader:
             # Ensure the data is on the correct device (GPU/CPU)
             x_batch, labels_batch = x_batch.to(device), labels_batch.to(device)
 
-            if torch.max(labels_batch) >= 20:  # Assuming 20 classes (indices 0-19)
+            if torch.max(labels_batch) >= 18:  
                 print(f"Invalid target label found: {torch.max(labels_batch)}, shape: {labels_batch.shape}")
                 continue
 
@@ -85,7 +83,7 @@ def train(network, data_loder, loss_function, optimizer, device, epochs=20, batc
             running_loss += loss.item()
 
         # Print loss after each epoch
-        print(f'Epoch {epoch+1}, Loss: {running_loss / len(data_loder)}')
+        print(f'Epoch {epoch+1}, Loss: {running_loss / len(data_loader)}')
 
 
 
@@ -140,17 +138,19 @@ label_to_index = {
     '7': 7, 
     '8': 8, 
     '9': 9, 
-    'plus': 10,
-    'minus': 11, 
-    'slash': 12, 
-    'dot': 13, 
-    'w': 14, 
-    'x': 15, 
-    'y': 16, 
-    'z': 17,  
-    '(': 18, 
-    ')': 19,
+    'add': 10,
+    'dec': 11, 
+    'div': 12, 
+    'eq': 13, 
+    'mul': 14,
+    'sub': 15,
+    # '(': 16, 
+    # ')': 17, 
+    'x': 16,  
+    'y': 17, 
+    # 'z': 20,
 }
+
 
 # Reverse mapping for predictions
 index_to_label = {v: k for k, v in label_to_index.items()}

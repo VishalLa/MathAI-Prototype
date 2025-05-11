@@ -37,29 +37,29 @@ class ModelPipeline:
 
         # Load and prepare dataset
         self.X, self.Y = load_dataset(
-            data_foldel = self.data_folder
+            folder_path = self.data_folder
         )
 
         print(f"Unique labels in dataset: {torch.unique(self.Y)}")
         self.X_train, self.X_test, self.Y_train, self.Y_test = split_dataset(self.X, self.Y)
 
-        self.X_train, self.Y_train = shuffle(self.X_train, self.Y_train, random_state=42)
+        self.X_train, self.Y_train = shuffle(self.X_train, self.Y_train, random_state=101)
 
         self.X_train = self.X_train.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
         self.X_test = self.X_test.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
         self.Y_train = self.Y_train.clone().detach().to(torch.long).to(self.device)
         self.Y_test = self.Y_test.clone().detach().to(torch.long).to(self.device)
 
-    def train_model(self, data_loder, loss_finction, optimizer):
+    def train_model(self, data_loader, loss_function, optimizer):
         train(
             network=self.model,
-            data_loder=data_loder,
-            loss_function=loss_finction,
+            data_loader=data_loader,
+            loss_function=loss_function,
             optimizer=optimizer,
             device=self.device
         )
 
-    def cross_validate_model(self, k=5, batch_size=64, learning_rate=0.0001):
+    def cross_validate_model(self, k=10, batch_size=64, learning_rate=0.0001):
         kfold = KFold(n_splits=k, shuffle=True, random_state=42)
         fold_accuracies = []
         final_model = None
@@ -77,11 +77,12 @@ class ModelPipeline:
 
             self.model = CNN().to(self.device)
             criterion = nn.CrossEntropyLoss()
-            optimizer = optim.Adam(self.model.parameters(), lr=learning_rate)
+            optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate, weight_decay=1e-4)
+
 
             self.train_model(
-                data_loder=train_loader,
-                loss_finction=criterion,
+                data_loader=train_loader,
+                loss_function=criterion,
                 optimizer=optimizer
             )
 
@@ -92,8 +93,8 @@ class ModelPipeline:
                 for inputs, targets in val_loader:
                     inputs, targets = inputs.to(self.device), targets.to(self.device)
 
-                    if torch.max(targets) >= 20:
-                        print(f"Invalid target label found in validation: {torch.max(targets)}")
+                    if torch.max(targets) >= 18 or torch.min(targets) < 0:
+                        print(f"Invalid target label found in validation: {torch.max(targets)}, shape: {targets.shape}")
                         continue
 
                     outputs = self.model(inputs)
@@ -122,22 +123,28 @@ class ModelPipeline:
         save_model(self.model)
 
 
-data_folder = [
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\0', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\1', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\2', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\3', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\4', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\5', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\6', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\7', 
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\8', 
+data_folder  = [
+    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\(',
+    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\)',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\0',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\1',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\2',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\3',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\4',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\5',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\6',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\7',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\8',
     'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\9',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\add','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\+','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\dec','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\div',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\eq',    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\mul', 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\x','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\sub','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\-',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\add','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\dec','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\div',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\eq',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\mul',"C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\sub",
     'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\x',
     'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\y',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\z'
+    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\z',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\+',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\x',
+    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\÷',
 ]
 
 

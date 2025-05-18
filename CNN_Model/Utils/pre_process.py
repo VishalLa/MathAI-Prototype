@@ -32,7 +32,7 @@ def prepare_canvas(canvas_array):
 
 
 
-def predict_chars(canvas_array):
+def predict_chars(model, canvas_array):
     """
     Preprocesses the canvas array to prepare it for contour detection.
 
@@ -48,10 +48,8 @@ def predict_chars(canvas_array):
     else:
         gray = canvas_array
 
-    network = CNN()
-
     contours = detect_contours(gray)
     bounding_boxes = boundaryes(contours, gray)
-    char_array = predict_chracters(bounding_boxes, network)
+    char_array = predict_chracters(bounding_boxes, model)
 
     return char_array

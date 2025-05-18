@@ -2,7 +2,8 @@ import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 
-
+classes = 7
+iterations = 30
 
 def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
     '''
@@ -52,7 +53,7 @@ def split_dataset(X, Y, size=0.9):
 
 
 
-def train(network, data_loader, loss_function, optimizer, device, epochs=100, batch_size=64):
+def train(network, data_loader, loss_function, optimizer, device, epochs=iterations, batch_size=32):
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -60,7 +61,7 @@ def train(network, data_loader, loss_function, optimizer, device, epochs=100, ba
             # Ensure the data is on the correct device (GPU/CPU)
             x_batch, labels_batch = x_batch.to(device), labels_batch.to(device)
 
-            if torch.max(labels_batch) >= 18:  
+            if torch.max(labels_batch) >= classes:  
                 print(f"Invalid target label found: {torch.max(labels_batch)}, shape: {labels_batch.shape}")
                 continue
 
@@ -87,7 +88,7 @@ def train(network, data_loader, loss_function, optimizer, device, epochs=100, ba
 
 
 
-def test(network, X_test, Y_test, batch_size=64):
+def test(network, X_test, Y_test, batch_size=32):
     '''
     Tests the network on the test dataset.
 
@@ -135,20 +136,20 @@ label_to_index = {
     '4': 4, 
     '5': 5, 
     '6': 6, 
-    '7': 7, 
-    '8': 8, 
-    '9': 9, 
-    'add': 10,
-    'dec': 11, 
-    'div': 12, 
-    'eq': 13, 
-    'mul': 14,
-    'sub': 15,
-    # '(': 16, 
-    # ')': 17, 
-    'x': 16,  
-    'y': 17, 
-    # 'z': 20,
+    # '7': 7, 
+    # '8': 8, 
+    # '9': 9, 
+    # 'add': 10,
+    # 'dec': 11, 
+    # 'div': 12, 
+    # 'eq': 13, 
+    # 'mul': 14,
+    # 'sub': 15,
+    # # '(': 16, 
+    # # ')': 17, 
+    # 'x': 16,  
+    # 'y': 17, 
+    # # 'z': 20,
 }
 
 
@@ -161,7 +162,7 @@ def predict(network, x):
 
     Args:
         network (nn.Module): The trained model.
-        x (torch.Tensor): Input tensor [1,1,28,28].
+        x (torch.Tensor): Input tensor [1,1,64,64].
 
     Returns:
         str: Predicted character.
@@ -176,6 +177,7 @@ def predict(network, x):
     with torch.no_grad():
         output = network(x)
 
+    print(output)
     predicted_index = torch.argmax(output, dim=1).item()
     predicted_label = index_to_label[predicted_index]
 

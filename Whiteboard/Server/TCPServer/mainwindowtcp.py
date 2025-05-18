@@ -32,10 +32,12 @@ from PySide6.QtCore import (
 import json
 
 from Whiteboard.board import Ui_MainWindow
-from boardscenetcp import BoardScene
+from .boardscenetcp import BoardScene
 
 from CNN_Model.Utils.pre_process import predict_chars 
 from Server.tcpServerNet import start_server, MyServer, signal_manager
+from CNN_Model.Covonutional_neural_network.network import CNN
+network = CNN()
 
 myserver = MyServer()
 
@@ -173,7 +175,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print("No area selected")
             return
         print("Selected area:", selected_area.shape)
-        chars = predict_chars(selected_area)
+        chars = predict_chars(network, selected_area)
         print(f'Predicted chracters: {chars}')
 
 

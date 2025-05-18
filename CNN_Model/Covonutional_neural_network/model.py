@@ -14,6 +14,8 @@ from sklearn.model_selection import KFold
 
 from network import CNN
 
+classes = 7
+
 # Add Covonutional_neural_network path to model 
 
 current_directory = os.path.dirname(os.path.abspath(__file__))
@@ -45,8 +47,8 @@ class ModelPipeline:
 
         self.X_train, self.Y_train = shuffle(self.X_train, self.Y_train, random_state=101)
 
-        self.X_train = self.X_train.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
-        self.X_test = self.X_test.clone().detach().to(torch.float32).view(-1, 1, 28, 28).to(self.device)
+        self.X_train = self.X_train.clone().detach().to(torch.float32).view(-1, 1, 64, 64).to(self.device)
+        self.X_test = self.X_test.clone().detach().to(torch.float32).view(-1, 1, 64, 64).to(self.device)
         self.Y_train = self.Y_train.clone().detach().to(torch.long).to(self.device)
         self.Y_test = self.Y_test.clone().detach().to(torch.long).to(self.device)
 
@@ -59,7 +61,7 @@ class ModelPipeline:
             device=self.device
         )
 
-    def cross_validate_model(self, k=10, batch_size=64, learning_rate=0.0001):
+    def cross_validate_model(self, k=10, batch_size=32, learning_rate=0.00001):
         kfold = KFold(n_splits=k, shuffle=True, random_state=42)
         fold_accuracies = []
         final_model = None
@@ -75,7 +77,7 @@ class ModelPipeline:
             train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
             val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-            self.model = CNN().to(self.device)
+            self.model = CNN(num_classes=classes).to(self.device)
             criterion = nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate, weight_decay=1e-4)
 
@@ -93,7 +95,7 @@ class ModelPipeline:
                 for inputs, targets in val_loader:
                     inputs, targets = inputs.to(self.device), targets.to(self.device)
 
-                    if torch.max(targets) >= 18 or torch.min(targets) < 0:
+                    if torch.max(targets) >= classes or torch.min(targets) < 0:
                         print(f"Invalid target label found in validation: {torch.max(targets)}, shape: {targets.shape}")
                         continue
 
@@ -124,27 +126,13 @@ class ModelPipeline:
 
 
 data_folder  = [
-    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\(',
-    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\)',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\0',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\1',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\2',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\3',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\4',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\5',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\6',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\7',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\8',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\9',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\add','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\dec','C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\div',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\eq',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\mul',"C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\sub",
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\x',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\y',
-    # 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\z',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\+',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\x',
-    'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\dataset\\symbols\\÷',
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 0",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 1",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 2",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 3",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 4",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 5",
+    "C:\\Users\\visha\\OneDrive\\Desktop\\new dataset\\char 6",
 ]
 
 

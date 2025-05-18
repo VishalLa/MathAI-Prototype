@@ -3,9 +3,9 @@ from pydantic import BaseModel
 import uvicorn
 import logging
 import torch
-from Utils.pre_process import preprocess_canvas
-from Covonutional_neural_network.network import CNN
-from Covonutional_neural_network.modelUttils.model_utils import load_model
+from CNN_Model.Utils.pre_process import prepare_canvas, predict_chars
+from CNN_Model.Covonutional_neural_network.network import CNN
+from CNN_Model.Covonutional_neural_network.modelUttils.model_utils import load_model
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -14,9 +14,9 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
 # Load the trained model
-MODEL_PATH = "C:\\Users\\visha\\OneDrive\\Desktop\\New folder\\Model\\model_parameters.pth"
-model = CNN()
-model = load_model(model, MODEL_PATH)
+MODEL_PATH = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth"
+network = CNN()
+model = load_model(network, MODEL_PATH)
 
 # Define the request schema
 class PredictionRequest(BaseModel):
@@ -38,11 +38,11 @@ def predict_endpoint(request: PredictionRequest):
             raise HTTPException(status_code=400, detail="No actions provided")
 
         # Preprocess the actions array (convert to tensor, etc.)
-        input_tensor = torch.tensor(actions, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
-        logging.info(f"Input tensor shape: {input_tensor.shape}")
+        processed_canvas = prepare_canvas(actions)
+        logging.info(f"Processed canvas shape: {processed_canvas.shape}")
 
         # Make a prediction
-        predicted_class = preprocess_canvas(input_tensor)
+        predicted_class = predict_chars(model, processed_canvas)
 
         logging.info(f"Prediction: {predicted_class}")
         return {"prediction": predicted_class}

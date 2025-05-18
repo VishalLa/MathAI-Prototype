@@ -4,7 +4,7 @@ import cv2
 import torch 
 import numpy as np
 
-from Whiteboard.UI.mainwindow import MainWindow
+from Whiteboard.Server.TCPServer.mainwindowtcp import MainWindow
 
 from PySide6.QtWidgets import QApplication
 

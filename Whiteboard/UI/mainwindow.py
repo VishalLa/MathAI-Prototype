@@ -18,7 +18,7 @@ from PySide6.QtGui import (
 from PySide6.QtCore import Qt
 
 from Whiteboard.board import Ui_MainWindow
-from boardscene import BoardScene
+from .boardscene import BoardScene
 from CNN_Model.Utils.pre_process import predict_chars 
 
 
@@ -139,10 +139,3 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def color_changed(self, color):
         self.scene.change_color(color)
-
-
-if __name__ == '__main__':
-    app = QApplication()
-    window = MainWindow()
-    window.show()
-    app.exec()

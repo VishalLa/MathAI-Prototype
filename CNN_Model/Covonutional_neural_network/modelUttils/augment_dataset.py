@@ -17,14 +17,14 @@ def add_label_noise(image: np.ndarray, label: int)->np.ndarray:
 
     h, w = image.shape
 
-    x = np.linspace(0, np.pi * (label + 1), w)
-    y = np.linspace(0, np.pi * (label + 1), h)
+    x = np.linspace(0, np.pi * (label + 1)*0.05, w)
+    y = np.linspace(0, np.pi * (label + 1)*0.05, h)
     xv, yv = np.meshgrid(x, y)
-    sinuosidal_noise = 0.1 * np.sin(xv+yv)
+    phase_shift = label*np.pi/100
+    sinuosidal_noise = 0.05 * np.sin(xv+yv+phase_shift)
 
-    means = np.linspace(0 , 0.3, 21)
-    stds = np.linspace(0.05, 0.15, 21)
-    noise = np.random.normal(loc=means[label], scale=stds[label], size=image.shape)
+    stds = np.linspace(0.00002, 0.00005, 18)
+    noise = np.random.normal(loc=0.0, scale=stds[label], size=image.shape)
 
     total_noise = noise + sinuosidal_noise
     
@@ -34,7 +34,7 @@ def add_label_noise(image: np.ndarray, label: int)->np.ndarray:
     return (noisy_image*255).astype(np.uint8)
 
 
-def add_gaussian_noise(image: np.ndarray, mean: float = 0.1, std: float = 0.2) -> np.ndarray:
+def add_gaussian_noise(image: np.ndarray, mean: float = 0.01, std: float = 0.02) -> np.ndarray:
     """
     Apply Gaussian noise to the input image.
 
@@ -48,8 +48,8 @@ def add_gaussian_noise(image: np.ndarray, mean: float = 0.1, std: float = 0.2) -
     """
 
     image = image.astype(np.float32) / 255.0
-
-    noise = np.random.normal(mean, std, image.shape)
+    rng = np.random.default_rng(seed=42)
+    noise = rng.normal(mean, std, image.shape)
     noisy_image = image + noise
     noisy_image = np.clip(noisy_image, 0, 1)
     return (noisy_image*255).astype(np.uint8)   

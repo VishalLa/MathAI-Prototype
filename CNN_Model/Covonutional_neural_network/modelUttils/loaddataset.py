@@ -3,7 +3,7 @@ import cv2
 import torch
 import numpy as np
 from PIL import Image
-from .augment_dataset import apply_combined_noise, add_gaussian_noise
+from .augment_dataset import apply_combined_noise, add_gaussian_noise, add_label_noise
 
 
 label_to_index = {
@@ -14,56 +14,27 @@ label_to_index = {
     '4': 4, 
     '5': 5, 
     '6': 6, 
-    '7': 7, 
-    '8': 8, 
-    '9': 9, 
-    'add': 10,
-    'dec': 11, 
-    'div': 12, 
-    'eq': 13, 
-    'mul': 14,
-    'sub': 15,
-    # '(': 16, 
-    # ')': 17, 
-    'x': 16,  
-    'y': 17, 
-    # 'z': 20,
+    # '7': 7, 
+    # '8': 8, 
+    # '9': 9, 
+    # 'add': 10,
+    # 'dec': 11, 
+    # 'div': 12, 
+    # 'eq': 13, 
+    # 'mul': 14,
+    # 'sub': 15,
+    # # '(': 16, 
+    # # ')': 17, 
+    # 'x': 16,  
+    # 'y': 17, 
+    # # 'z': 20,
 }
 
 # Reverse mapping for predictions 
 
 index_to_label = {v: k for k, v in label_to_index.items()}
 
-def add_padding(image: np.ndarray, stride:int=28)-> np.ndarray:
-    '''
-    Adding padding to the image to make it a square with dimensions that are multiples of stride.
-    '''
-
-    h, w = image.shape[:2]
-    max_side = max(h, w)
-    new_size = ((max_side + stride - 1) // stride) * stride
-    padded_image = np.ones((new_size, new_size), dtype=np.uint8) * 255
-    x_offset = (new_size - w) // 2
-    y_offset = (new_size - h) // 2
-    padded_image[y_offset:y_offset+h, x_offset:x_offset+w] = image
-    return padded_image
-
-
-def load_mnist_dataset(path: str)-> tuple[np.ndarray, np.ndarray]:
-    data = np.load(path, allow_pickle=True)
-    x_train = data['x_train']
-    y_train = data['y_train']
-    x_test = data['x_test']
-    y_test = data['y_test']
-
-    image = np.concatenate((x_train, x_test), axis=0)
-    label = np.concatenate((y_train, y_test), axis=0)
-
-    return image, label
-
-
-
-def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (28, 28))-> tuple[np.ndarray, np.ndarray]:
+def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (64, 64))-> tuple[np.ndarray, np.ndarray]:
     
     custom_images, custom_labels = [], []
 
@@ -82,26 +53,7 @@ def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (28,
                 img_array = np.array(img)
                 img_array = cv2.convertScaleAbs(img_array) if img_array.dtype != np.uint8 else img_array
 
-                _, binary_image = cv2.threshold(img_array, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                # dected edge
-                lower_thresh = max(0, 0.5*np.median(binary_image))
-                upper_thersh = min(255, 1.5*np.median(binary_image))
-                edges = cv2.Canny(binary_image, lower_thresh, upper_thersh)
-
-
-                # Check if edges are detected
-                if np.sum(edges) == 0:
-                    print(f"No edges detected in {file_path}. Skipping this image.")
-                    char_image_resized = cv2.resize(binary_image, target_size, interpolation=cv2.INTER_AREA)
-
-                else:
-                    x, y, w, h = cv2.boundingRect(edges)
-                    char_image_resized = cv2.resize(binary_image, target_size, interpolation=cv2.INTER_AREA)
-                    char_image = edges[y:y+h, x:x+w]
-                    char_image = add_padding(char_image, stride=4)
-                    char_image_resized = cv2.resize(char_image, target_size, interpolation=cv2.INTER_AREA)
-                
+                char_image_resized = cv2.resize(img_array, target_size, interpolation=cv2.INTER_AREA)
                 
                 # Rotate 10% of images randomly
                 if np.random.rand() < 0.1:
@@ -129,8 +81,10 @@ def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (28,
                         continue
 
                     numeric_label = label_to_index[label_str]
-                    # binary_image = add_label_noise(char_image, numeric_label)
-                    noisy_image = add_gaussian_noise(char_image_resized)
+                    # noisy_image = add_label_noise(char_image, numeric_label)
+                    # noisy_image = add_gaussian_noise(char_image)
+                    # noisy_image = apply_combined_noise(char_image)
+                    noisy_image = char_image
                 else:
                     print(f'Skipping image {file_path}: Unable to extract label')
                     continue
@@ -149,24 +103,10 @@ def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (28,
     return np.array(custom_images), np.array(custom_labels)
 
 
-
 def load_dataset(folder_path: list[str])->tuple[np.ndarray, np.ndarray]:
-
     print('Loading Dataset .............')
-    path_for_mnist = 'C:\\Users\\visha\\OneDrive\\Desktop\\entiredataset\\mnist.npz'
-    mnist_images, mnist_labels = load_mnist_dataset(path_for_mnist)
-
-    # Normalize MNIST images to [0, 1]
-    mnist_images = mnist_images / 255.0
-
-    # Add a channel dimension to MNIST images (for grayscale images)
-    mnist_images = mnist_images[:, np.newaxis, :, :]
-
     images = []
     labels = []
-
-    images.append(mnist_images)
-    labels.append(mnist_labels)
 
     for path in folder_path:
         if not os.path.exists(path):

@@ -110,6 +110,10 @@ def boundaryes(contours, gray):
 
     # sort charachers left to right
     bounding_boxes = sorted(bounding_boxes, key=lambda b: b[0])
+    for i, (x, char_image) in enumerate(bounding_boxes):
+        cv2.imwrite(f'char_{i}.png', char_image * 255)
+        bounding_boxes[i] = (x, char_image)
+
 
     return bounding_boxes
 

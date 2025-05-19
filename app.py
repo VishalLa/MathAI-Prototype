@@ -4,7 +4,7 @@ import uvicorn
 import logging
 import torch
 from CNN_Model.Utils.pre_process import prepare_canvas, predict_chars
-from CNN_Model.Covonutional_neural_network.network import CNN
+from CNN_Model.Covonutional_neural_network.CNNnetwork import CNN
 from CNN_Model.Covonutional_neural_network.modelUttils.model_utils import load_model
 
 # Initialize FastAPI app

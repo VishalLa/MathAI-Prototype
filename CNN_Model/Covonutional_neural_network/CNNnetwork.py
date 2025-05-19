@@ -59,7 +59,6 @@ class CNN(nn.Module):
             ),
             nn.BatchNorm2d(64),
             nn.ReLU(),
-            nn.MaxPool2d(2,2),
             nn.Dropout2d(0.4),
 
             # 4th conv layer
@@ -76,6 +75,19 @@ class CNN(nn.Module):
             nn.ReLU(),
             nn.AdaptiveAvgPool2d((4, 4)),
             nn.Dropout2d(0.4),
+
+            # 5th conv layer
+            nn.Conv2d(
+                in_channels=128,
+                out_channels=256,
+                kernel_size=(3,3),
+                padding=1,
+                stride=2,
+                bias=False
+            ),
+            nn.BatchNorm2d(256),
+            nn.ReLU(),
+            nn.Dropout2d(0.4),
         )
 
         # Calculate flattened size dynamically
@@ -86,12 +98,16 @@ class CNN(nn.Module):
         self.flatten = nn.Flatten()
 
         self.fc_layers = nn.Sequential(
-            nn.Linear(in_features=output_size, out_features=128, bias=True),
-            nn.ReLU(),
+            nn.Linear(in_features=output_size, out_features=256, bias=True),
+            nn.Tanh(),
+            nn.Dropout(0.4),
+
+            nn.Linear(in_features=256, out_features=128, bias=True),
+            nn.Tanh(),
             nn.Dropout(0.4),
 
             nn.Linear(in_features=128, out_features=64, bias=True),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Dropout(0.4),
 
             nn.Linear(in_features=64, out_features=num_classes),

@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 from .augment_dataset import apply_combined_noise, add_gaussian_noise, add_label_noise
 
+classes = 7
 
 label_to_index = {
     '0': 0,
@@ -132,7 +133,7 @@ def load_dataset(folder_path: list[str])->tuple[np.ndarray, np.ndarray]:
     combined_labels = np.concatenate(labels, axis=0)
 
     label_count = {}
-    for i in range(20):
+    for i in range(classes):
         label_count[i] = len(combined_images[combined_labels==i])
 
     # Convert from NumPy to Tensor

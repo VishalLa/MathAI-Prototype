@@ -36,8 +36,12 @@ from .boardscenetcp import BoardScene
 
 from CNN_Model.Utils.pre_process import predict_chars 
 from Server.tcpServerNet import start_server, MyServer, signal_manager
-from CNN_Model.Covonutional_neural_network.network import CNN
-network = CNN()
+from CNN_Model.Covonutional_neural_network.CNNnetwork import CNN
+
+from CNN_Model.Covonutional_neural_network.ViTnetwork import ViT
+
+# network = CNN()
+network = ViT()
 
 myserver = MyServer()
 

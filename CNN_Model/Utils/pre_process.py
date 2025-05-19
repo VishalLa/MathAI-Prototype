@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
-from ..Covonutional_neural_network.network import CNN
+from ..Covonutional_neural_network.CNNnetwork import CNN
+from ..Covonutional_neural_network.ViTnetwork import ViT
+
 from ..Utils.contour import detect_contours, boundaryes, predict_chracters
 
 

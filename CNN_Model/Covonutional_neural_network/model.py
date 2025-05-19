@@ -6,15 +6,17 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-from modelUttils.loaddataset import load_dataset
-from modelUttils.model_utils import save_model, test, train, split_dataset
+from Covonutional_neural_network.modelUttils.loaddataset import load_dataset
+from Covonutional_neural_network.modelUttils.model_utils import save_model, test, train, split_dataset
 
 from sklearn.utils import shuffle
 from sklearn.model_selection import KFold
 
-from network import CNN
+from Covonutional_neural_network.CNNnetwork import CNN
+from Covonutional_neural_network.ViTnetwork import ViT
 
 classes = 7
+learning_rate = 0.0001
 
 # Add Covonutional_neural_network path to model 
 
@@ -27,13 +29,25 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 
 # Load the model architecture
-network = CNN().to(device)
+# network = CNN().to(device)
+network = ViT(
+    img_size=64,
+    patch_size=8,
+    in_channels=1,
+    num_classes=classes,
+    emb_size=384,
+    depth=8,
+    n_heads=12,
+    mlp_dim=764
+).to(device)
 
 
 class ModelPipeline:
     def __init__(self, data_folder: list[str]):
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-        self.model = CNN().to(self.device)
+
+        self.model = network
+
         self.loss_fn = nn.CrossEntropyLoss()
         self.data_folder = data_folder
 
@@ -61,7 +75,7 @@ class ModelPipeline:
             device=self.device
         )
 
-    def cross_validate_model(self, k=10, batch_size=32, learning_rate=0.00001):
+    def cross_validate_model(self, k=4, batch_size=64, learning_rate=learning_rate):
         kfold = KFold(n_splits=k, shuffle=True, random_state=42)
         fold_accuracies = []
         final_model = None
@@ -77,7 +91,17 @@ class ModelPipeline:
             train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
             val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
 
-            self.model = CNN(num_classes=classes).to(self.device)
+            self.model = ViT(
+                img_size=64,
+                patch_size=8,
+                in_channels=1,
+                num_classes=classes,
+                emb_size=384,
+                depth=8,
+                n_heads=12,
+                mlp_dim=764
+            ).to(device)
+
             criterion = nn.CrossEntropyLoss()
             optimizer = torch.optim.Adam(self.model.parameters(), lr=learning_rate, weight_decay=1e-4)
 

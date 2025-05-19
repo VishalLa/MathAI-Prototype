@@ -3,7 +3,7 @@ import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 
 classes = 7
-iterations = 30
+iterations = 15
 
 def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
     '''
@@ -53,7 +53,9 @@ def split_dataset(X, Y, size=0.9):
 
 
 
-def train(network, data_loader, loss_function, optimizer, device, epochs=iterations, batch_size=32):
+def train(network, data_loader, loss_function, optimizer, device, epochs=iterations, batch_size=64):
+    
+    network.train()
 
     for epoch in range(epochs):
         running_loss = 0.0
@@ -88,7 +90,7 @@ def train(network, data_loader, loss_function, optimizer, device, epochs=iterati
 
 
 
-def test(network, X_test, Y_test, batch_size=32):
+def test(network, X_test, Y_test, batch_size=64):
     '''
     Tests the network on the test dataset.
 

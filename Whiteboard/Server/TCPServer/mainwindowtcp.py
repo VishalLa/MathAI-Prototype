@@ -1,5 +1,7 @@
 import os 
-import sys 
+import sys
+import cv2
+import torch  
 
 root_dir = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI"
 sys.path.append(root_dir)
@@ -34,24 +36,23 @@ import json
 from Whiteboard.board import Ui_MainWindow
 from .boardscenetcp import BoardScene
 
-from CNN_Model.Utils.pre_process import predict_chars 
+from CNN_Model.Utils.pre_process import predict_charheacters, prepare_canvas
+
 from Server.tcpServerNet import start_server, MyServer, signal_manager
-from CNN_Model.Covonutional_neural_network.CNNnetwork import CNN
-
-from CNN_Model.Covonutional_neural_network.ViTnetwork import ViT
-
-# network = CNN()
-network = ViT()
 
 myserver = MyServer()
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self):
+    def __init__(self, model):
         super().__init__()
         self.setupUi(self)
 
         self.child_windows = []
+
+        self.predict_result = None 
+
+        self.network = model
 
         self.tool_button_group = QButtonGroup()
         self.tool_button_group.setExclusive(True)
@@ -95,6 +96,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.actionOpen.triggered.connect(self.load_file)
         self.actionSave.triggered.connect(self.save_file)
         self.actionSave_As.triggered.connect(self.save_file)
+
+        self.statusBar().showMessage("Ready")
+        self.statusBar().showMessage(f"Prediction: {self.predict_result}")
 
 
     def save_file(self):
@@ -175,12 +179,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def predict(self):
         selected_area = self.scene.get_selected_region()
+        cv2.imwrite("Selected area.png", selected_area)
         if selected_area.size == 0:
             print("No area selected")
             return
         print("Selected area:", selected_area.shape)
-        chars = predict_chars(network, selected_area)
-        print(f'Predicted chracters: {chars}')
+        
+        processed_canvas = prepare_canvas(selected_area)
+        self.predict_result = predict_charheacters(model=self.network, canvas_array=processed_canvas)
+        print(f'Predicted chracters: {self.predict_result}')
 
 
     def on_pen_selection(self):
@@ -247,14 +254,3 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def color_changed(self, color):
         self.scene.change_color(color)
-
-
-if __name__ == '__main__':
-    app = QApplication()
-    start_server(myserver)
-    window = MainWindow()
-    signal_manager.action_signal.connect(window.scene.get_drawing_events)
-    signal_manager.data_ack.connect(window.build_scene_file)
-    window.show()
-
-    app.exec()

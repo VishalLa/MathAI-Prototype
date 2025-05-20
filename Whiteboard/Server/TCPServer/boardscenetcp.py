@@ -56,6 +56,9 @@ class BoardScene(QGraphicsScene):
         self.selected_area = None 
         self.selection_path = QPainterPath()
 
+        self.selection_start = None
+        self.selection_end = None
+
         self.color = QColor("#000000")
         self.size = 5
         self.pathItem = None 
@@ -116,6 +119,7 @@ class BoardScene(QGraphicsScene):
             if self.selection_mode:
                 self.drawing = False
                 self.selection_start = event.scenePos()
+                self.selected_path = QPainterPath()
                 self.selection_path.moveTo(self.selection_start)
 
             else:
@@ -130,7 +134,7 @@ class BoardScene(QGraphicsScene):
 
 
     def mouseMoveEvent(self, event):
-        if self.selection_mode and hasattr(self, 'selection_start'):
+        if self.selection_mode and self.selection_start is not None:
                 self.selection_end = event.scenePos()
                 self.update()
             
@@ -149,7 +153,9 @@ class BoardScene(QGraphicsScene):
     
     def mouseReleaseEvent(self, event):
         if event.button() == Qt.MouseButton.LeftButton:
-            if self.selection_mode and self.selection_path:
+            if self.selection_mode and self.selection_path is not None:
+                self.selected_area = self.get_selected_region() 
+                self.selection_path = QPainterPath()
                 self.update()
             else:
                 self.end_drawing()
@@ -216,6 +222,12 @@ class BoardScene(QGraphicsScene):
 
     def enable_selection_mode(self, enable):
         self.selection_mode = enable
+
+        self.selection_start = None 
+        self.selection_end = None 
+        self.selection_path = QPainterPath()
+        self.update()
+
         for item in self.items():
             item.setFlag(QGraphicsItem.ItemIsSelectable, enable)
             item.setFlag(QGraphicsItem.ItemIsMovable, enable)
@@ -235,10 +247,13 @@ class BoardScene(QGraphicsScene):
 
 
     def get_selected_region(self):
-        if not hasattr(self, 'selection_start') or not hasattr(self, 'selection_end'):
+        if self.selection_start is None or self.selection_end is None:
             return None 
         
         rect = QRectF(self.selection_start, self.selection_end).normalized()
+
+        if rect.width() <= 1 or rect.height() <= 1:
+            return np.array([])
 
         img = QImage(int(rect.width()), int(rect.height()), QImage.Format.Format_RGB32)
         img.fill(Qt.white)
@@ -304,7 +319,7 @@ class BoardScene(QGraphicsScene):
     def drawForeground(self, painter, rect):
         super().drawForeground(painter, rect)
 
-        if self.selection_mode and hasattr(self, 'selection_start') and hasattr(self, 'selection_end'):
+        if self.selection_mode and self.selection_start is not None and self.selection_end is not None:
             pen = QPen(Qt.black, 0.8, Qt.DotLine)
             painter.setPen(pen)
 

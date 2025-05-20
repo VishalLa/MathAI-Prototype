@@ -1,9 +1,11 @@
 import cv2
+import torch
 import numpy as np
 from ..Covonutional_neural_network.CNNnetwork import CNN
 from ..Covonutional_neural_network.ViTnetwork import ViT
 
-from ..Utils.contour import detect_contours, boundaryes, predict_chracters
+from ..Covonutional_neural_network.modelUttils.model_utils import predict
+from ..Utils.contour import detect_contours, boundaryes
 
 
 def prepare_canvas(canvas_array):
@@ -27,31 +29,65 @@ def prepare_canvas(canvas_array):
     y_offset = (max_side - h) // 2
     padded_image[y_offset:y_offset+h, x_offset:x_offset+w] = binary_image
 
-    # Step 4: Resize to 28x28
-    resized = cv2.resize(padded_image, (28, 28), interpolation=cv2.INTER_NEAREST)
+    resized_img = cv2.resize(padded_image, (64, 64), interpolation=cv2.INTER_AREA)
 
-    return resized
+    return resized_img
 
+label_to_index = {
+    '0': 0,
+    '1': 1, 
+    '2': 2, 
+    '3': 3, 
+    '4': 4, 
+    '5': 5, 
+    '6': 6, 
+    # '7': 7, 
+    # '8': 8, 
+    # '9': 9, 
+    # 'add': 10,
+    # 'dec': 11, 
+    # 'div': 12, 
+    # 'eq': 13, 
+    # 'mul': 14,
+    # 'sub': 15,
+    # # '(': 16, 
+    # # ')': 17, 
+    # 'x': 16,  
+    # 'y': 17, 
+    # # 'z': 20,
+}
 
+# Reverse mapping for predictions 
 
-def predict_chars(model, canvas_array):
-    """
-    Preprocesses the canvas array to prepare it for contour detection.
+index_to_label = {v: k for k, v in label_to_index.items()}
 
-    Parameters:
-        canvas_array (np.ndarray): The canvas state as a NumPy array.
+def predict_charheacters(model, canvas_array):
 
-    Returns:
-        np.ndarray: The preprocessed canvas.
-    """
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = model.to(device)
+    model.eval()
     # Convert to grayscale if not already
-    if len(canvas_array.shape) == 3:
+    if len(canvas_array) == 3:
         gray = cv2.cvtColor(canvas_array, cv2.COLOR_RGB2GRAY)
     else:
         gray = canvas_array
 
     contours = detect_contours(gray)
     bounding_boxes = boundaryes(contours, gray)
-    char_array = predict_chracters(bounding_boxes, model)
 
-    return char_array
+    predictions = []
+
+    if not bounding_boxes:
+        print("No valid characters detected.")
+        return []
+
+    for _, img in bounding_boxes:
+        img_tensor = torch.tensor(img, dtype=torch.float32).unsqueeze(0).unsqueeze(0)
+        img_tensor = img_tensor.to(device)
+
+        pred = predict(network=model, x=img_tensor)
+        predictions.append(pred)
+
+    # chars = [index_to_label[i] for i in predictions]
+
+    return predictions

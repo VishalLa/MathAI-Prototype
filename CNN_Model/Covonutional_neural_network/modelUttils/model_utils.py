@@ -26,11 +26,23 @@ def load_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\C
         network (nn.Module): The PyTorch model to load the parameters into.
         filename (str): Name of the file to load the parameters from.
     '''
-    state_dict = torch.load(filename)
-    network.load_state_dict(state_dict)
-    network.eval()  # Set the model to evaluation mode
-    print(f'Model parameters loaded from {filename}')
-    return network
+    try:
+        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        
+        state_dict = torch.load(filename, map_location=device)
+        
+        if 'pos_embed' in state_dict:
+            pos_embed = state_dict['pos_embed']
+            if pos_embed.shape[1] != network.pos_embed.shape[1]:
+                print("Adjusting positional embeddings size...")
+                
+        network.load_state_dict(state_dict)
+        network.eval()
+        print(f'Model parameters loaded from {filename}')
+        return network
+    except Exception as e:
+        print(f'Error loading model: {e}')
+        raise
 
 
 

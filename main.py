@@ -15,17 +15,19 @@ from CNN_Model.Covonutional_neural_network.modelUttils.model_utils import load_m
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-# network = CNN()
-network = ViT(
-    img_size=64,
-    patch_size=8,
-    in_channels=1,
-    num_classes=7,
-    emb_size=384,
-    depth=8,
-    n_heads=12,
-    mlp_dim=764
-)
+network = CNN()
+
+# network = ViT(
+#     img_size=64,
+#     patch_size=8,
+#     in_channels=1,
+#     num_classes=7,
+#     emb_size=384,
+#     depth=8,
+#     n_heads=12,
+#     mlp_dim=764
+# )
+
 model_path = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth"
 
 try:

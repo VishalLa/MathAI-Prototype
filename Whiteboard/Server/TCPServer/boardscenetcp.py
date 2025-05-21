@@ -123,6 +123,11 @@ class BoardScene(QGraphicsScene):
                 self.selection_path.moveTo(self.selection_start)
 
             else:
+                self.selection_start = None
+                self.selection_end = None
+                self.selection_path = QPainterPath()
+                self.selected_area = None
+                
                 self.start_drawing(event.scenePos())
                 
                 for item in self.items():
@@ -162,7 +167,7 @@ class BoardScene(QGraphicsScene):
 
         
     def get_drawing_path(self):
-        return self.drawn_path  # was self.drawn_paths
+        return self.drawn_path
 
     def clear_drawn_paths(self):
         self.drawn_path = []
@@ -196,6 +201,9 @@ class BoardScene(QGraphicsScene):
     
     
     def start_drawing(self, pos):
+        if self.selection_mode:
+            return
+        
         self.drawing = True
         self.path = QPainterPath()
         self.previous_position = pos
@@ -223,10 +231,12 @@ class BoardScene(QGraphicsScene):
     def enable_selection_mode(self, enable):
         self.selection_mode = enable
 
-        self.selection_start = None 
-        self.selection_end = None 
-        self.selection_path = QPainterPath()
-        self.update()
+        if not enable:
+            self.selection_start = None 
+            self.selection_end = None 
+            self.selection_path = QPainterPath()
+            self.selected_area = None
+            self.update()
 
         for item in self.items():
             item.setFlag(QGraphicsItem.ItemIsSelectable, enable)

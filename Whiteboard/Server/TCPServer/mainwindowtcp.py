@@ -192,11 +192,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def on_pen_selection(self):
         self.scene.enable_selection_mode(False)
+        self.pb_Select.setChecked(False)
+        self.pb_Eraser.setChecked(False)
+        self.pb_Pen.setChecked(True)
         self.color_changed(self.current_color)
 
 
     def on_eraser_selected(self):
         self.scene.enable_selection_mode(False)
+        self.pb_Select.setChecked(False)
+        self.pb_Eraser.setChecked(True)
+        self.pb_Pen.setChecked(False)
         self.color_changed(QColor('#FFFFFF'))
 
 

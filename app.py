@@ -7,7 +7,6 @@ from CNN_Model.Utils.pre_process import prepare_canvas, predict_charheacters
 from CNN_Model.Covonutional_neural_network.CNNnetwork import CNN
 from CNN_Model.Covonutional_neural_network.modelUttils.model_utils import load_model
 
-# Initialize FastAPI app
 app = FastAPI()
 
 logging.basicConfig(level=logging.INFO)
@@ -17,7 +16,6 @@ MODEL_PATH = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_para
 network = CNN()
 model = load_model(network, MODEL_PATH)
 
-# Define the request schema
 class PredictionRequest(BaseModel):
     actions: list
 
@@ -47,6 +45,7 @@ def predict_endpoint(request: PredictionRequest):
     except Exception as e:
         logging.error(f"Error during prediction: {e}")
         raise HTTPException(status_code=500, detail="An error occurred during prediction.")
+    
     
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8000)

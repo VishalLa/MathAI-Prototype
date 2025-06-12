@@ -2,10 +2,10 @@ import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
 
-classes = 7
-iterations = 15
+classes = 10
+iterations = 20
 
-def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
+def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters_for_CNN.pth'):
     '''
     Saves the model parameters (weights and biases) to a file.
 
@@ -18,7 +18,7 @@ def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\C
 
 
 
-def load_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth'):
+def load_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters_for_CNN.pth'):
     '''
     Loads the model parameters (weights and biases) from a file.
 
@@ -150,9 +150,9 @@ label_to_index = {
     '4': 4, 
     '5': 5, 
     '6': 6, 
-    # '7': 7, 
-    # '8': 8, 
-    # '9': 9, 
+    '7': 7, 
+    '8': 8, 
+    '9': 9, 
     # 'add': 10,
     # 'dec': 11, 
     # 'div': 12, 

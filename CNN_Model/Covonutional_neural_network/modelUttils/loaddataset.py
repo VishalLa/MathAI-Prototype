@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 from .augment_dataset import apply_combined_noise, add_gaussian_noise, add_label_noise
 
-classes = 7
+classes = 10
 
 label_to_index = {
     '0': 0,
@@ -15,9 +15,9 @@ label_to_index = {
     '4': 4, 
     '5': 5, 
     '6': 6, 
-    # '7': 7, 
-    # '8': 8, 
-    # '9': 9, 
+    '7': 7, 
+    '8': 8, 
+    '9': 9, 
     # 'add': 10,
     # 'dec': 11, 
     # 'div': 12, 

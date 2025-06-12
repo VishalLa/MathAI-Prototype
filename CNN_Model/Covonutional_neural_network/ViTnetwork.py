@@ -23,8 +23,9 @@ class PatchEmbedding(nn.Module):
         x = self.norm(x)
         return x
 
+
 class ViT(nn.Module):
-    def __init__(self, img_size=64, patch_size=8, in_channels=1, num_classes=7, emb_size=384, depth=8, n_heads=12, mlp_dim=768):
+    def __init__(self, img_size=64, patch_size=8, in_channels=1, num_classes=10, emb_size=384, depth=8, n_heads=12, mlp_dim=768):
         super(ViT, self).__init__()
 
         self.patch_embed = PatchEmbedding(in_channels, patch_size, emb_size, img_size)

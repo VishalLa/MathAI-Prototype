@@ -19,7 +19,8 @@ from PySide6.QtCore import Qt
 
 from Whiteboard.board import Ui_MainWindow
 from .boardscene import BoardScene
-from CNN_Model.Utils.pre_process import predict_chars 
+from CNN_Model.Utils.pre_process import prepare_canvas
+from CNN_Model.Utils.pred import predict_characters
 
 
 class MainWindow(QMainWindow, Ui_MainWindow):

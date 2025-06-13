@@ -2,8 +2,11 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import uvicorn
 import logging
-import torch
-from CNN_Model.Utils.pre_process import prepare_canvas, predict_charheacters
+import torch 
+
+from CNN_Model.Utils.pre_process import prepare_canvas
+from CNN_Model.Utils.pred import predict_characters
+
 from CNN_Model.Covonutional_neural_network.CNNnetwork import CNN
 from CNN_Model.Covonutional_neural_network.modelUttils.model_utils import load_model
 
@@ -12,7 +15,7 @@ app = FastAPI()
 logging.basicConfig(level=logging.INFO)
 
 # Load the trained model
-MODEL_PATH = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters.pth"
+MODEL_PATH = "C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters_for_CNN.pth"
 network = CNN()
 model = load_model(network, MODEL_PATH)
 
@@ -37,7 +40,7 @@ def predict_endpoint(request: PredictionRequest):
         processed_canvas = prepare_canvas(actions)
         logging.info(f"Processed canvas shape: {processed_canvas.shape}")
 
-        predicted_class = predict_charheacters(model=model, canvas_array=processed_canvas)
+        predicted_class = predict_characters(model=model, canvas_array=processed_canvas)
 
         logging.info(f"Prediction: {predicted_class}")
         return {"prediction": predicted_class}

@@ -1,9 +1,8 @@
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
+from required_variables import  classes, iterations
 
-classes = 10
-iterations = 20
 
 def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters_for_CNN.pth'):
     '''
@@ -139,60 +138,3 @@ def test(network, X_test, Y_test, batch_size=64):
             correct += (predicted == labels_batch).sum().item()
 
     print(f'Accuracy: {100 * correct / total:.2f}%')
-
-
-
-label_to_index = {
-    '0': 0,
-    '1': 1, 
-    '2': 2, 
-    '3': 3, 
-    '4': 4, 
-    '5': 5, 
-    '6': 6, 
-    '7': 7, 
-    '8': 8, 
-    '9': 9, 
-    # 'add': 10,
-    # 'dec': 11, 
-    # 'div': 12, 
-    # 'eq': 13, 
-    # 'mul': 14,
-    # 'sub': 15,
-    # # '(': 16, 
-    # # ')': 17, 
-    # 'x': 16,  
-    # 'y': 17, 
-    # # 'z': 20,
-}
-
-
-# Reverse mapping for predictions
-index_to_label = {v: k for k, v in label_to_index.items()}
-
-def predict(network, x):
-    """
-    Predicts the class of a single input using the trained network.
-
-    Args:
-        network (nn.Module): The trained model.
-        x (torch.Tensor): Input tensor [1,1,64,64].
-
-    Returns:
-        str: Predicted character.
-    """
-    if not isinstance(x, torch.Tensor):
-        raise TypeError("Input must be a torch.Tensor")
-
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    x = x.to(device)
-    network = network.to(device)
-
-    with torch.no_grad():
-        output = network(x)
-
-    print(output)
-    predicted_index = torch.argmax(output, dim=1).item()
-    predicted_label = index_to_label[predicted_index]
-
-    return predicted_label

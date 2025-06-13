@@ -5,35 +5,8 @@ import numpy as np
 from PIL import Image
 from .augment_dataset import apply_combined_noise, add_gaussian_noise, add_label_noise
 
-classes = 10
+from required_variables import classes, index_to_label, label_to_index
 
-label_to_index = {
-    '0': 0,
-    '1': 1, 
-    '2': 2, 
-    '3': 3, 
-    '4': 4, 
-    '5': 5, 
-    '6': 6, 
-    '7': 7, 
-    '8': 8, 
-    '9': 9, 
-    # 'add': 10,
-    # 'dec': 11, 
-    # 'div': 12, 
-    # 'eq': 13, 
-    # 'mul': 14,
-    # 'sub': 15,
-    # # '(': 16, 
-    # # ')': 17, 
-    # 'x': 16,  
-    # 'y': 17, 
-    # # 'z': 20,
-}
-
-# Reverse mapping for predictions 
-
-index_to_label = {v: k for k, v in label_to_index.items()}
 
 def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (64, 64))-> tuple[np.ndarray, np.ndarray]:
     

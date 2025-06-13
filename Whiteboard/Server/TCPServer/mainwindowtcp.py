@@ -36,7 +36,8 @@ import json
 from Whiteboard.board import Ui_MainWindow
 from .boardscenetcp import BoardScene
 
-from CNN_Model.Utils.pre_process import predict_charheacters, prepare_canvas
+from CNN_Model.Utils.pre_process import prepare_canvas
+from CNN_Model.Utils.pred import predict_characters
 
 from Server.tcpServerNet import start_server, MyServer, signal_manager
 
@@ -183,10 +184,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if selected_area.size == 0:
             print("No area selected")
             return
+        
         print("Selected area:", selected_area.shape)
         
         processed_canvas = prepare_canvas(selected_area)
-        self.predict_result = predict_charheacters(model=self.network, canvas_array=processed_canvas)
+        self.predict_result = predict_characters(model=self.network, canvas_array=processed_canvas)
         print(f'Predicted chracters: {self.predict_result}')
 
 

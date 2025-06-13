@@ -4,6 +4,8 @@ import torch.nn.functional as F
 import sys
 import os
 
+from required_variables import classes
+
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -32,7 +34,7 @@ class SEBlock(nn.Module):
 # CNN Model
 # ------------------------------
 class CNN(nn.Module):
-    def __init__(self, num_classes=10):
+    def __init__(self, num_classes=classes):
         super(CNN, self).__init__()
 
         self.conv_layers = nn.Sequential(

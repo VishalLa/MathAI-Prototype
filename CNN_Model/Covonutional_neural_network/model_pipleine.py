@@ -21,8 +21,7 @@ from sklearn.model_selection import KFold
 from Covonutional_neural_network.CNNnetwork import CNN, FocalLoss
 from Covonutional_neural_network.ViTnetwork import ViT
 
-classes = 10
-learning_rate = 0.0001
+from required_variables import learning_rate, classes
 
 # Add Covonutional_neural_network path to model 
 
@@ -89,7 +88,7 @@ class ModelPipeline:
         
         model = copy.deepcopy(self.model).to(self.device)
 
-        criterion = FocalLoss(gamma=2.0, alpha=1.0, num_classes=classes).to(self.device)
+        criterion = FocalLoss(gamma=2.0, alpha=1.0).to(self.device)
         
         optimizer = optim.Adam(model.parameters(), lr=learning_rate, weight_decay=1e-4)
 

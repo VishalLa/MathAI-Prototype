@@ -148,7 +148,7 @@ def boundaryes(contours: list[np.ndarray], gray: np.ndarray) -> list[np.ndarray]
             continue
 
         # Filter out small or unlikely regions
-        if area < 10 or w < 5 or h < 5 or not (0.1 < aspect_ratio < 10):
+        if area < 9 or w < 4 or h < 4 or not (0.15 < aspect_ratio < 10):
             continue
 
         char_crop_1 = gray[y:y+h, x:x+w]
@@ -170,15 +170,15 @@ def boundaryes(contours: list[np.ndarray], gray: np.ndarray) -> list[np.ndarray]
 
     bounding_boxes = sorted(bounding_boxes, key=lambda b: b[0])
 
-    print(bounding_boxes)
+    # print(bounding_boxes)
     
     for j, (_, i) in enumerate(bounding_boxes):
         if i.dtype != np.uint8:
             img_to_save = (i * 255).astype(np.uint8)
         else:
             img_to_save = i
-        print(f"Saving char{j+1}.png: dtype={img_to_save.dtype}, min={img_to_save.min()}, max={img_to_save.max()}")
-        cv2.imwrite(f'char{j+1}.png', img_to_save)
+        # print(f"Saving char{j+1}.png: dtype={img_to_save.dtype}, min={img_to_save.min()}, max={img_to_save.max()}")
+        # cv2.imwrite(f'char{j+1}.png', img_to_save)
 
     return bounding_boxes
 

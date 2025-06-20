@@ -29,11 +29,14 @@ def predict(network, x):
     network = network.to(device)
 
     with torch.no_grad():
-        output = network(x)
+        outputs = network(x)
+        _, y_pred = torch.max(outputs, 1)
+        # y_pred = y_pred.cpu().numpy()
 
-    print(output)
-    predicted_index = torch.argmax(output, dim=1).item()
-    predicted_label = index_to_label[predicted_index]
+    # print(y_pred)
+    # predicted_index = torch.argmax(output, dim=1).item()
+    predicted_label = index_to_label[y_pred.item()]
+    # predicted_label = y_pred
 
     return predicted_label
 

@@ -5,7 +5,7 @@ import numpy as np
 from PIL import Image
 from .augment_dataset import apply_combined_noise, add_gaussian_noise, add_label_noise
 
-from required_variables import classes, index_to_label, label_to_index
+from ..required_variables import *
 
 
 def load_dataset_for_image(folder_path: str, target_size: tuple[int, int] = (64, 64))-> tuple[np.ndarray, np.ndarray]:

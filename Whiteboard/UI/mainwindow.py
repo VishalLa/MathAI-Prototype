@@ -72,7 +72,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             print("No area selected")
             return
         print("Selected area:", selected_area.shape)
-        chars = predict_chars(selected_area)
+        processed_canvas = prepare_canvas(selected_area)
+        chars = predict_characters(processed_canvas)
         print(f'Predicted chracters: {chars}')
 
 

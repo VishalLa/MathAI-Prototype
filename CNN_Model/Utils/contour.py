@@ -169,6 +169,8 @@ def boundaryes(contours: list[np.ndarray], gray: np.ndarray) -> list[np.ndarray]
         bounding_boxes.append((x, char_bin))
 
     bounding_boxes = sorted(bounding_boxes, key=lambda b: b[0])
+
+    print(bounding_boxes)
     
     for j, (_, i) in enumerate(bounding_boxes):
         if i.dtype != np.uint8:

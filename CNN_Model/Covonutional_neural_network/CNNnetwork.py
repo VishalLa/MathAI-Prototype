@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import sys
 import os
 
-from required_variables import classes
+from CNN_Model.Covonutional_neural_network.required_variables import classes
 
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 

@@ -21,7 +21,7 @@ from sklearn.model_selection import KFold
 from Covonutional_neural_network.CNNnetwork import CNN, FocalLoss
 from Covonutional_neural_network.ViTnetwork import ViT
 
-from required_variables import learning_rate, classes
+from CNN_Model.Covonutional_neural_network.required_variables import learning_rate, classes
 
 # Add Covonutional_neural_network path to model 
 

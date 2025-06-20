@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 from torch.utils.data import DataLoader, TensorDataset
-from required_variables import  classes, iterations
+from CNN_Model.Covonutional_neural_network.required_variables import  classes, iterations
 
 
 def save_model(network, filename='C:\\Users\\visha\\OneDrive\\Desktop\\MathAI\\CNN_Model\\model_parameters_for_CNN.pth'):

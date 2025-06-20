@@ -5,7 +5,7 @@ import numpy as np
 from ..Covonutional_neural_network.CNNnetwork import CNN 
 from ..Utils.contour import detect_contours, boundaryes
 
-from required_variables import index_to_label
+from CNN_Model.Covonutional_neural_network.required_variables import index_to_label
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 

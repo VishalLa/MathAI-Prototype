@@ -30,3 +30,7 @@ def evaluate_expression(predicted_tokens):
     except Exception as e:
         return f'Error: Invalid expression ({e})'
 
+
+def evaluate_expression(predicted_tockens):
+    if not predicted_tockens:
+        return 'Error: Empty expression'
